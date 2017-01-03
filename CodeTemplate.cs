@@ -2,9 +2,9 @@
 /// \file <NameOfFile>.<Extension>
 /// \copyright (C) year, FG!P. All rights reserved.
 /// \date <year>-<month>-<day>
-/// \author <Author 1>
-/// \author <Author 2>
-/// \author <Author n>
+/// \author Franco Solis
+/// \author Giancarlo Longhi
+/// \author Federico Ugarte
 /// <summary> 
 /// <Description>
 /// </summary>
