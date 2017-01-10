@@ -14,7 +14,7 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
 
-	#region
+	#region Constants
 
 	public const float FLOOR_WIDTH = 10f;
 
@@ -25,6 +25,15 @@ public class PlayerController : MonoBehaviour
 	[SerializeField] private int _lane;
 	[SerializeField] private float _forwardSpeed;
 	[SerializeField] private bool _gravityInverted;
+	[SerializeField] private bool _isGrounded;
+	[SerializeField] private float _groundCheckDistance;
+	[SerializeField] float _gravityMultiplier;
+	[SerializeField] private Rigidbody _rigidbody;
+	[SerializeField] private float _jumpPower;
+	[SerializeField] private float _origGroundCheckDistance;
+	[SerializeField] private Camera _camera;
+	[SerializeField] private bool _2DMode;
+
 	#endregion
 
 	#region Properties
@@ -53,6 +62,30 @@ public class PlayerController : MonoBehaviour
 		}
 	}
 
+	public float GroundCheckDistance
+	{
+		get
+		{
+			return _groundCheckDistance;
+		}
+		set
+		{
+			_groundCheckDistance = value;
+		}
+	}
+
+	public float JumpPower
+	{
+		get
+		{
+			return _jumpPower;
+		}
+		set
+		{
+			_jumpPower = value;
+		}
+	}
+
 	#endregion
 
 	#region Methods
@@ -63,6 +96,14 @@ public class PlayerController : MonoBehaviour
 		_lane = 2;
 		_forwardSpeed = 2f;
 		_gravityInverted = false;
+		_groundCheckDistance = 0.6f;
+		_rigidbody = GetComponent<Rigidbody>();
+		_isGrounded = true;
+		_jumpPower = 12f;
+		_origGroundCheckDistance = _groundCheckDistance;
+		_gravityMultiplier = 2f;
+		_camera = GetComponentInChildren<Camera>();
+		_2DMode = false;
 	}
 
 	// Update is called once per frame
@@ -73,28 +114,48 @@ public class PlayerController : MonoBehaviour
 			Move("Left");
 		}
 
-		if (Input.GetKeyDown (KeyCode.D))
+		if (Input.GetKeyDown(KeyCode.D))
 		{
 			Move("Right");
 		}
 
-		if (Input.GetKeyDown (KeyCode.LeftShift))
-		{
-			ChangeGravity();
-		}
-
-		if (Input.GetKeyDown(KeyCode.Q))
+		if (Input.GetKeyDown(KeyCode.E))
 		{
 			ChangeDimension();
 		}
 
 		//Move forward
-		transform.Translate(2f * Time.deltaTime, 0, 0);
+		transform.Translate(_forwardSpeed * Time.deltaTime, 0, 0);
+		if (_2DMode)
+		{
+			_camera.transform.position = new Vector3(transform.position.x + 6, 0, -10);
+		}
+		else
+		{
+			_camera.transform.position = new Vector3(transform.position.x - 8, 0, 0);
+		}
 	}
 
 	void FixedUpdate() 
 	{
-		
+		CheckGroundStatus();
+
+		if(_isGrounded)
+		{
+			if (Input.GetKeyDown(KeyCode.Q))
+			{
+				ChangeGravity();
+			}
+
+			if(Input.GetKeyDown(KeyCode.Space))
+			{
+				Jump();
+			}
+		}
+		else 
+		{
+			HandleAirborneMovement();
+		}
 	}
 
 	void Move(string direction) 
@@ -102,7 +163,7 @@ public class PlayerController : MonoBehaviour
 		switch (direction)
 		{
 		case "Left":
-			if(_lane != 1 && _lane != 4)
+			if (_lane != 1 && _lane != 4)
 			{
 				_lane--;
 				transform.Translate(new Vector3(0, 0, FLOOR_WIDTH / 4));
@@ -110,7 +171,7 @@ public class PlayerController : MonoBehaviour
 			break;
 
 		case "Right":
-			if(_lane != 3 && _lane != 6)
+			if (_lane != 3 && _lane != 6)
 			{
 				_lane++;
 				transform.Translate(new Vector3(0, 0, -FLOOR_WIDTH / 4));
@@ -121,7 +182,14 @@ public class PlayerController : MonoBehaviour
 
 	void Jump() 
 	{
-		
+		if (_gravityInverted)
+		{
+			_rigidbody.velocity = new Vector3(_rigidbody.velocity.x, -_jumpPower, _rigidbody.velocity.z);
+		}
+		else
+		{
+			_rigidbody.velocity = new Vector3(_rigidbody.velocity.x, _jumpPower, _rigidbody.velocity.z);
+		}
 	}
 
 	void ChangeGravity() 
@@ -132,8 +200,69 @@ public class PlayerController : MonoBehaviour
 
 	void ChangeDimension() 
 	{
-		
+		if (_2DMode)
+		{
+			_camera.transform.position = new Vector3(transform.position.x - 8, 0, 0);
+			_camera.transform.Rotate(0, 90, 0);
+			_camera.orthographic = false;
+			_2DMode = false;
+		}
+		else
+		{
+			_camera.transform.position = new Vector3(transform.position.x + 6, 0, -10);
+			_camera.transform.Rotate(0, -90, 0);
+			_camera.orthographic = true;
+			_2DMode = true;
+		}
 	}
 
+	void CheckGroundStatus()
+	{
+		#if UNITY_EDITOR
+		// helper to visualise the ground check ray in the scene view
+		Debug.DrawLine(transform.position + (Vector3.up * 0.1f), transform.position + (Vector3.up * 0.1f) + (Vector3.down * _groundCheckDistance));
+		#endif
+		// 0.1f is a small offset to start the ray from inside the character
+		// it is also good to note that the transform position in the sample assets is at the base of the character
+		if (_gravityInverted)
+		{
+			if (Physics.Raycast(transform.position + (Vector3.down * 0.1f), Vector3.up, _groundCheckDistance))
+			{
+				_isGrounded = true;
+			}
+			else
+			{
+				_isGrounded = false;
+			}
+		}
+		else
+		{
+			if (Physics.Raycast(transform.position + (Vector3.up * 0.1f), Vector3.down, _groundCheckDistance))
+			{
+				_isGrounded = true;
+			}
+			else
+			{
+				_isGrounded = false;
+			}
+		}
+	}
+
+	void HandleAirborneMovement()
+	{
+		// apply extra gravity from multiplier:
+		Vector3 extraGravityForce = (Physics.gravity * _gravityMultiplier) - Physics.gravity;
+		_rigidbody.AddForce(extraGravityForce);
+
+		if (_gravityInverted)
+		{
+			_groundCheckDistance = _rigidbody.velocity.y > 0 ? _origGroundCheckDistance : 0.01f;
+		}
+		else
+		{
+			_groundCheckDistance = _rigidbody.velocity.y < 0 ? _origGroundCheckDistance : 0.01f;
+		}
+	}
+		
 	#endregion
 }

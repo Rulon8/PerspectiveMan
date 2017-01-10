@@ -700,7 +700,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1799916007}
   m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: -5, y: 1, z: 0}
+  m_LocalPosition: {x: -8, y: 3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1921652309}
@@ -824,6 +824,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _lane: 0
   _forwardSpeed: 0
+  _gravityInverted: 0
+  _isGrounded: 0
+  _groundCheckDistance: 0
+  _gravityMultiplier: 2
+  _rigidbody: {fileID: 0}
+  _jumpPower: 0
+  _origGroundCheckDistance: 0
+  _camera: {fileID: 0}
+  _2DMode: 0
 --- !u!4 &2147204265 stripped
 Transform:
   m_PrefabParentObject: {fileID: 4225872814401116, guid: 49ed6bfe63cb210498b43917372029b3,
