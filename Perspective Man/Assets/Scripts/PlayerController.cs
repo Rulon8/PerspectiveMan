@@ -31,8 +31,6 @@ public class PlayerController : MonoBehaviour
 	[SerializeField] private Rigidbody _rigidbody;
 	[SerializeField] private float _jumpPower;
 	[SerializeField] private float _origGroundCheckDistance;
-	[SerializeField] private Camera _camera;
-	[SerializeField] private bool _2DMode;
 
 	#endregion
 
@@ -102,8 +100,6 @@ public class PlayerController : MonoBehaviour
 		_jumpPower = 12f;
 		_origGroundCheckDistance = _groundCheckDistance;
 		_gravityMultiplier = 2f;
-		_camera = GetComponentInChildren<Camera>();
-		_2DMode = false;
 	}
 
 	// Update is called once per frame
@@ -119,21 +115,8 @@ public class PlayerController : MonoBehaviour
 			Move("Right");
 		}
 
-		if (Input.GetKeyDown(KeyCode.E))
-		{
-			ChangeDimension();
-		}
-
 		//Move forward
 		transform.Translate(_forwardSpeed * Time.deltaTime, 0, 0);
-		if (_2DMode)
-		{
-			_camera.transform.position = new Vector3(transform.position.x + 6, 0, -10);
-		}
-		else
-		{
-			_camera.transform.position = new Vector3(transform.position.x - 8, 0, 0);
-		}
 	}
 
 	void FixedUpdate() 
@@ -196,24 +179,6 @@ public class PlayerController : MonoBehaviour
 	{
 		Physics.gravity = new Vector3(0, -Physics.gravity.y, 0);
 		_gravityInverted = !_gravityInverted;
-	}
-
-	void ChangeDimension() 
-	{
-		if (_2DMode)
-		{
-			_camera.transform.position = new Vector3(transform.position.x - 8, 0, 0);
-			_camera.transform.Rotate(0, 90, 0);
-			_camera.orthographic = false;
-			_2DMode = false;
-		}
-		else
-		{
-			_camera.transform.position = new Vector3(transform.position.x + 6, 0, -10);
-			_camera.transform.Rotate(0, -90, 0);
-			_camera.orthographic = true;
-			_2DMode = true;
-		}
 	}
 
 	void CheckGroundStatus()
