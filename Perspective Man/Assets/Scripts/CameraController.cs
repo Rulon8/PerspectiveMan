@@ -9,6 +9,9 @@ public class CameraController : MonoBehaviour {
 	[SerializeField] private bool _2DMode;
 	[SerializeField] private Camera _camera;
 	[SerializeField] private GameObject _player;
+	[SerializeField] private bool _changingPerspective;
+	[SerializeField] private float _changeSpeed;
+	[SerializeField] private Rigidbody _playerRigidbody;
 
 	#endregion
 
@@ -26,6 +29,18 @@ public class CameraController : MonoBehaviour {
 		}
 	}
 
+	public bool ChangingPerspective
+	{
+		get
+		{
+			return _changingPerspective;
+		}
+		set
+		{
+			_changingPerspective = value;
+		}
+	}
+
 	#endregion
 
 	#region Methods
@@ -34,43 +49,65 @@ public class CameraController : MonoBehaviour {
 	void Start () {
 		_2DMode = false;
 		_camera = GetComponent<Camera>();
+		_camera.farClipPlane = 60f;
 		_player = GameObject.FindWithTag("Player");
+		_changingPerspective = false;
+		_changeSpeed = 45f;
+		_playerRigidbody = _player.GetComponent<Rigidbody>();
 	}
 	
 	// Update is called once per frame
 	void Update () {
+		if (!_changingPerspective)
+		{
+			if (Input.GetKeyDown(KeyCode.E))
+			{
+				StartCoroutine(ChangeDimension());
+			}
 
-		if (Input.GetKeyDown(KeyCode.E))
-		{
-			ChangeDimension();
-		}
-
-		if (_2DMode)
-		{
-			transform.position = new Vector3(_player.transform.position.x + 6, 0, -10);
-		}
-		else
-		{
-			transform.position = new Vector3(_player.transform.position.x - 8, 0, 0);
+			if (_2DMode)
+			{
+				transform.position = new Vector3(_player.transform.position.x + 6, 0, -14);
+			}
+			else
+			{
+				transform.position = new Vector3(_player.transform.position.x - 8, 0, 0);
+			}
 		}
 	}
 
-	void ChangeDimension() 
+	IEnumerator ChangeDimension() 
 	{
+		_changingPerspective = true;
+		_playerRigidbody.constraints = RigidbodyConstraints.FreezeAll;
 		if (_2DMode)
 		{
-			transform.position = new Vector3(_player.transform.position.x - 8, 0, 0);
-			transform.Rotate(0, 90, 0);
 			_camera.orthographic = false;
+			_camera.farClipPlane = 10f;
+			for (float i = 0f; i < _changeSpeed; i++)
+			{
+				_camera.farClipPlane += 50f / _changeSpeed;
+				transform.Translate(-14f / _changeSpeed, 0, 14f / _changeSpeed, Space.World);
+				transform.Rotate(0, 90f / _changeSpeed, 0);
+				yield return null;
+			}
 			_2DMode = false;
 		}
 		else
 		{
-			transform.position = new Vector3(_player.transform.position.x + 6, 0, -10);
-			transform.Rotate(0, -90, 0);
+			for (float i = 0f; i < _changeSpeed; i++)
+			{
+				_camera.farClipPlane -= 50f / _changeSpeed;
+				transform.Translate(14f / _changeSpeed, 0, -14f / _changeSpeed, Space.World);
+				transform.Rotate(0, -90f / _changeSpeed, 0);
+				yield return null;
+			}
+			_camera.farClipPlane = 20f;
 			_camera.orthographic = true;
 			_2DMode = true;
 		}
+		_playerRigidbody.constraints = RigidbodyConstraints.FreezeRotation;
+		_changingPerspective = false;
 	}
 
 	#endregion

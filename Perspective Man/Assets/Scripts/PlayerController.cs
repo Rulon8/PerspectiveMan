@@ -31,7 +31,8 @@ public class PlayerController : MonoBehaviour
 	[SerializeField] private Rigidbody _rigidbody;
 	[SerializeField] private float _jumpPower;
 	[SerializeField] private float _origGroundCheckDistance;
-
+	[SerializeField] private Camera _camera;
+	[SerializeField] private CameraController _cameraController;
 	#endregion
 
 	#region Properties
@@ -100,44 +101,55 @@ public class PlayerController : MonoBehaviour
 		_jumpPower = 12f;
 		_origGroundCheckDistance = _groundCheckDistance;
 		_gravityMultiplier = 2f;
+		_camera = Camera.main;
+		_cameraController = (CameraController) _camera.GetComponent("CameraController");
 	}
 
 	// Update is called once per frame
 	void Update() 
 	{
-		if (Input.GetKeyDown(KeyCode.A))
+		if (!_cameraController.TwoDMode)
 		{
-			Move("Left");
-		}
+			if (Input.GetKeyDown(KeyCode.A))
+			{
+				Move("Left");
+			}
 
-		if (Input.GetKeyDown(KeyCode.D))
-		{
-			Move("Right");
+			if (Input.GetKeyDown(KeyCode.D))
+			{
+				Move("Right");
+			}
 		}
 
 		//Move forward
-		transform.Translate(_forwardSpeed * Time.deltaTime, 0, 0);
+		if (!_cameraController.ChangingPerspective)
+		{
+			transform.Translate(_forwardSpeed * Time.deltaTime, 0, 0);
+		}
 	}
 
 	void FixedUpdate() 
 	{
 		CheckGroundStatus();
 
-		if(_isGrounded)
+		if (!_cameraController.ChangingPerspective)
 		{
-			if (Input.GetKeyDown(KeyCode.Q))
+			if (_isGrounded)
 			{
-				ChangeGravity();
-			}
+				if (Input.GetKeyDown(KeyCode.Q))
+				{
+					ChangeGravity();
+				}
 
-			if(Input.GetKeyDown(KeyCode.Space))
-			{
-				Jump();
+				if (Input.GetKeyDown(KeyCode.Space))
+				{
+					Jump();
+				}
 			}
-		}
-		else 
-		{
-			HandleAirborneMovement();
+			else
+			{
+				HandleAirborneMovement();
+			}
 		}
 	}
 
