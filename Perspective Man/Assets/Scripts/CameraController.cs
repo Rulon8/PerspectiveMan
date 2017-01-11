@@ -79,7 +79,8 @@ public class CameraController : MonoBehaviour {
 	IEnumerator ChangeDimension() 
 	{
 		_changingPerspective = true;
-		_playerRigidbody.constraints = RigidbodyConstraints.FreezeAll;
+		Time.timeScale = 0; //Pauses time while perspective changes
+
 		if (_2DMode)
 		{
 			_camera.orthographic = false;
@@ -106,7 +107,8 @@ public class CameraController : MonoBehaviour {
 			_camera.orthographic = true;
 			_2DMode = true;
 		}
-		_playerRigidbody.constraints = RigidbodyConstraints.FreezeRotation;
+		Time.timeScale = 1;  //Unpause time
+
 		_changingPerspective = false;
 	}
 
