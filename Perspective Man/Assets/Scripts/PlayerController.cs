@@ -4,7 +4,7 @@
 /// \date 2017-01-03
 /// \author Rulon
 /// <summary> 
-/// Contiene todas las mecanicas o acciones que el jugador puede realizar dentro del juego
+/// Contains every player mechanic in the game: forward movment, movement between lanes, gravity change, and jump.
 /// </summary>
 
 using System.Collections;
@@ -33,6 +33,7 @@ public class PlayerController : MonoBehaviour
 	[SerializeField] private float _origGroundCheckDistance;
 	[SerializeField] private Camera _camera;
 	[SerializeField] private CameraController _cameraController;
+	[SerializeField] private bool _isGravityChanging;
 	#endregion
 
 	#region Properties
@@ -103,6 +104,7 @@ public class PlayerController : MonoBehaviour
 		_gravityMultiplier = 2f;
 		_camera = Camera.main;
 		_cameraController = (CameraController) _camera.GetComponent("CameraController");
+		_isGravityChanging = false;
 	}
 
 	// Update is called once per frame
@@ -130,20 +132,27 @@ public class PlayerController : MonoBehaviour
 
 	void FixedUpdate() 
 	{
-		CheckGroundStatus();
-
 		if (!_cameraController.ChangingPerspective)
 		{
-			if (_isGrounded)
+			CheckGroundStatus();
+
+			if (!_isGravityChanging)
 			{
+				if (_isGrounded)
+				{
+					if (Input.GetKeyDown(KeyCode.Space))
+					{
+						Jump();
+					}
+				}
+				else
+				{
+					HandleAirborneMovement();
+				}
+
 				if (Input.GetKeyDown(KeyCode.Q))
 				{
 					ChangeGravity();
-				}
-
-				if (Input.GetKeyDown(KeyCode.Space))
-				{
-					Jump();
 				}
 			}
 			else
@@ -189,6 +198,7 @@ public class PlayerController : MonoBehaviour
 
 	void ChangeGravity() 
 	{
+		_isGravityChanging = true;
 		Physics.gravity = new Vector3(0, -Physics.gravity.y, 0);
 		_gravityInverted = !_gravityInverted;
 	}
@@ -206,6 +216,7 @@ public class PlayerController : MonoBehaviour
 			if (Physics.Raycast(transform.position + (Vector3.down * 0.1f), Vector3.up, _groundCheckDistance))
 			{
 				_isGrounded = true;
+				_isGravityChanging = false;
 			}
 			else
 			{
@@ -217,6 +228,7 @@ public class PlayerController : MonoBehaviour
 			if (Physics.Raycast(transform.position + (Vector3.up * 0.1f), Vector3.down, _groundCheckDistance))
 			{
 				_isGrounded = true;
+				_isGravityChanging = false;
 			}
 			else
 			{

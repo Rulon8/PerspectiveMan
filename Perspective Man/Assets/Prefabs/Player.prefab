@@ -205,6 +205,48 @@ MonoBehaviour:
   _2DMode: 0
   _camera: {fileID: 0}
   _player: {fileID: 0}
+  _changingPerspective: 0
+  _changeSpeed: 0
+  _playerRigidbody: {fileID: 0}
+  _orthographic:
+    e00: 0
+    e01: 0
+    e02: 0
+    e03: 0
+    e10: 0
+    e11: 0
+    e12: 0
+    e13: 0
+    e20: 0
+    e21: 0
+    e22: 0
+    e23: 0
+    e30: 0
+    e31: 0
+    e32: 0
+    e33: 0
+  _perspective:
+    e00: 0
+    e01: 0
+    e02: 0
+    e03: 0
+    e10: 0
+    e11: 0
+    e12: 0
+    e13: 0
+    e20: 0
+    e21: 0
+    e22: 0
+    e23: 0
+    e30: 0
+    e31: 0
+    e32: 0
+    e33: 0
+  _aspect: 0
+  _fieldOfView: 0
+  _nearClipPlane: 0
+  _farClipPlane: 0
+  _orthographicViewSize: 0
 --- !u!114 &114951694607954308
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -225,6 +267,9 @@ MonoBehaviour:
   _rigidbody: {fileID: 0}
   _jumpPower: 0
   _origGroundCheckDistance: 0
+  _camera: {fileID: 0}
+  _cameraController: {fileID: 0}
+  _isGravityChanging: 0
 --- !u!124 &124481548711955720
 Behaviour:
   m_ObjectHideFlags: 1
