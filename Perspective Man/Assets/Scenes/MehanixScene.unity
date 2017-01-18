@@ -965,26 +965,6 @@ Prefab:
       propertyPath: m_RootOrder
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 20145340518262464, guid: 837812bab20ae594f8f900ab12d86d7d,
-        type: 2}
-      propertyPath: orthographic
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 20145340518262464, guid: 837812bab20ae594f8f900ab12d86d7d,
-        type: 2}
-      propertyPath: m_RenderingPath
-      value: -1
-      objectReference: {fileID: 0}
-    - target: {fileID: 20145340518262464, guid: 837812bab20ae594f8f900ab12d86d7d,
-        type: 2}
-      propertyPath: m_OcclusionCulling
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 20145340518262464, guid: 837812bab20ae594f8f900ab12d86d7d,
-        type: 2}
-      propertyPath: m_HDR
-      value: 0
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 837812bab20ae594f8f900ab12d86d7d, type: 2}
   m_IsPrefabParent: 0

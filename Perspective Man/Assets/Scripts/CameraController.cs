@@ -13,6 +13,17 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour {
 
+	#region Constants
+
+	public const float X_TRANSLATION = 14f;
+	public const float Y_TRANSLATION = 0f;
+	public const float Z_TRANSLATION = 14f;
+	public const float X_ROTATION = 0f;
+	public const float Y_ROTATION = 90f;
+	public const float Z_ROTATION = 0f;
+
+	#endregion
+
 	#region Variables
 
 	[SerializeField] private bool _2DMode;
@@ -81,11 +92,11 @@ public class CameraController : MonoBehaviour {
 			{
 				if (_2DMode)
 				{
-					StartCoroutine(ChangeDimension(-14f, 0f, 14f, 0f, 90f, 0f, _camera.projectionMatrix, _perspective, 2f));
+					StartCoroutine(ChangeDimension(-X_TRANSLATION, Y_TRANSLATION, Z_TRANSLATION, X_ROTATION, Y_ROTATION, Z_ROTATION, _camera.projectionMatrix, _perspective, 2f));
 				}
 				else
 				{
-					StartCoroutine(ChangeDimension(14f, 0f, -14f, 0f, -90f, 0f, _camera.projectionMatrix, _orthographic, 2f));
+					StartCoroutine(ChangeDimension(X_TRANSLATION, Y_TRANSLATION, -Z_TRANSLATION, X_ROTATION, -Y_ROTATION, Z_ROTATION, _camera.projectionMatrix, _orthographic, 2f));
 				}
 			}
 
@@ -148,20 +159,11 @@ public class CameraController : MonoBehaviour {
 	{
 		Matrix4x4 ret = new Matrix4x4();
 		for (int i = 0; i < 16; i++)
+		{
 			ret[i] = Mathf.Lerp(from[i], to[i], time);
+		}
 		return ret;
 	}
 
-	IEnumerator ChangePerspective(Matrix4x4 src, Matrix4x4 dest, float duration)
-	{
-		float startTime = Time.time;
-		while (Time.time - startTime < duration)
-		{
-			_camera.projectionMatrix = MatrixLerp(src, dest, (Time.time - startTime) / duration);
-			yield return 1;
-		}
-		_camera.projectionMatrix = dest;
-	}
-		
 	#endregion
 }
