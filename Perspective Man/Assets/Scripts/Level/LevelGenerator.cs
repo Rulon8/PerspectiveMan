@@ -42,7 +42,7 @@ public class LevelGenerator : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () { 
-		if (_objectQueue.Peek().localPosition.x + _screenDistanceOffset < PlayerController.instance.distanceTraveled) //Last block is offscreen
+		if (_objectQueue.Peek().localPosition.x + _screenDistanceOffset < PlayerController.instance.DistanceTraveled) //Last block is offscreen
 		{
 			SpawnBlock();
 		}
