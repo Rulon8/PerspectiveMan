@@ -17,12 +17,13 @@ public class LevelGenerator : MonoBehaviour {
 
 	#region Variables
 
-	[SerializeField] private int _numberOfBlocks;
-	[SerializeField] private int _initialBlocks;
-	[SerializeField] private float _screenDistanceOffset;
+	[SerializeField] private int _numberOfBlocks = 40;
+	[SerializeField] private int _initialBlocks = 40;
+	[SerializeField] private float _startingPositionOffset = 10;
+	[SerializeField] private float _worldXLimit = 100;
+	[SerializeField] private float _screenDistanceOffset = 10;
 	[SerializeField] private List<Transform> _objectPrefabList;
 	[SerializeField] private Vector3 _startingPosition;
-	[SerializeField] private float _worldXLimit;
 
 	private Vector3 blockSize;
 	private Vector3 _nextPosition;
@@ -40,8 +41,8 @@ public class LevelGenerator : MonoBehaviour {
 	}
 
 	// Update is called once per frame
-	void Update () {
-		if (_objectQueue.Peek().localPosition.x + _screenDistanceOffset < PlayerController.instance.distanceTraveled)
+	void Update () { 
+		if (_objectQueue.Peek().localPosition.x + _screenDistanceOffset < PlayerController.instance.distanceTraveled) //Last block is offscreen
 		{
 			SpawnBlock();
 		}
@@ -55,7 +56,7 @@ public class LevelGenerator : MonoBehaviour {
 	void InitialSpawn()
 	{
 		_nextPosition = _startingPosition;
-		_nextPosition.x -= (blockSize.x * 10);
+		_nextPosition.x -= (blockSize.x * _startingPositionOffset);
 		for (int i = 0; i < _numberOfBlocks; i++)
 		{
 			SpawnBlock ();
@@ -66,15 +67,13 @@ public class LevelGenerator : MonoBehaviour {
 
 	void SpawnBlock()
 	{
-		//Transform o = _objectQueue.Dequeue();
 		int randomIndex = Random.Range (0, _objectPrefabList.Count);
 		Transform o = (Transform)Instantiate (_objectPrefabList [randomIndex]);
 		o.localPosition = _nextPosition;
 		_nextPosition.x += o.localScale.x;
 		_objectQueue.Enqueue (o);
-
-//		_objectQueue.Enqueue((Transform)Instantiate(objList[randomIndex]));
 	}
+
 	void DespawnLastBlock()
 	{
 		if (_objectQueue.Count > 0)

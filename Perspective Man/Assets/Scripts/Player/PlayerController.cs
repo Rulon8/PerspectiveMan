@@ -20,8 +20,10 @@ public class PlayerController : MonoBehaviour {
 	public static PlayerController instance;
 
 	public float distanceTraveled = 0;
+
 	[SerializeField] private float _jumpSpeed = 20f;
 	[SerializeField] private float _movementSpeed = 5f;
+
 	private Rigidbody _rigidbody;
 
 	#endregion
@@ -38,6 +40,7 @@ public class PlayerController : MonoBehaviour {
 
 		instance = this; 
 	}
+
 	void Start()
 	{
 		_rigidbody = GetComponent<Rigidbody>();
