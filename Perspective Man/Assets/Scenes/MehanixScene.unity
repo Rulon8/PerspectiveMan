@@ -509,7 +509,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &851056381
 Transform:
   m_ObjectHideFlags: 0
@@ -666,7 +666,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1019287598
 Transform:
   m_ObjectHideFlags: 0
@@ -923,7 +923,7 @@ Prefab:
     - target: {fileID: 114585604542668940, guid: 3facb260f2888496ca257d2bcf7c1a5c,
         type: 2}
       propertyPath: _startingPosition.y
-      value: 0
+      value: -4
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 3facb260f2888496ca257d2bcf7c1a5c, type: 2}
@@ -1016,6 +1016,16 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4098905542579616, guid: 837812bab20ae594f8f900ab12d86d7d, type: 2}
       propertyPath: m_RootOrder
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114483105274820678, guid: 837812bab20ae594f8f900ab12d86d7d,
+        type: 2}
+      propertyPath: _changingPerspective
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114483105274820678, guid: 837812bab20ae594f8f900ab12d86d7d,
+        type: 2}
+      propertyPath: _2DMode
       value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
