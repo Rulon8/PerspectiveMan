@@ -35,24 +35,28 @@ public class LevelGenerator : MonoBehaviour {
 
 	void Start () {
 		_objectQueue = new Queue<Transform>(_numberOfBlocks);
-		blockSize = _objectPrefabList [0].localScale;
-
+		blockSize = _objectPrefabList [0].localScale; //At the moment every block is the same size, this should change when blocks vary in size
 		InitialSpawn ();
+
 	}
 
-	// Update is called once per frame
 	void Update () { 
-		if (_objectQueue.Peek().localPosition.x + _screenDistanceOffset < PlayerController.instance.DistanceTraveled) //Last block is offscreen
+		
+		if (_objectQueue.Peek().localPosition.x + _screenDistanceOffset < PlayerController.instance.DistanceTraveled) //Spawns a block every time the player reaches a certain distance from the last block spawned
 		{
 			SpawnBlock();
 		}
-		if (_objectQueue.Count == _numberOfBlocks)
+
+		//When the maximum number of blocks is spawned, eliminates the last one
+		if (_objectQueue.Count >= _numberOfBlocks)
 		{
 			DespawnLastBlock ();
 		}
-
 	}
 
+	/// <summary>
+	/// Spawns a defined number of blocks before the beginning of the game
+	/// </summary>
 	void InitialSpawn()
 	{
 		_nextPosition = _startingPosition;
@@ -60,11 +64,13 @@ public class LevelGenerator : MonoBehaviour {
 		for (int i = 0; i < _numberOfBlocks; i++)
 		{
 			SpawnBlock ();
-			Debug.Log ("Initial Spawn");
 		}
 		Debug.Log (_objectQueue.Count);
 	}
 
+	/// <summary>
+	/// Spawns a single random block and places it on the queue of blocks
+	/// </summary>
 	void SpawnBlock()
 	{
 		int randomIndex = Random.Range (0, _objectPrefabList.Count);
@@ -74,6 +80,9 @@ public class LevelGenerator : MonoBehaviour {
 		_objectQueue.Enqueue (o);
 	}
 
+	/// <summary>
+	/// Despawns the last block of the level
+	/// </summary>
 	void DespawnLastBlock()
 	{
 		if (_objectQueue.Count > 0)

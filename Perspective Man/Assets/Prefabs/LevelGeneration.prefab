@@ -53,8 +53,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _numberOfBlocks: 40
   _initialBlocks: 40
+  _startingPositionOffset: 10
+  _worldXLimit: 40
   _screenDistanceOffset: 10
   _objectPrefabList:
   - {fileID: 0}
+  - {fileID: 0}
   _startingPosition: {x: 0, y: 0, z: 0}
-  _worldXLimit: 100
