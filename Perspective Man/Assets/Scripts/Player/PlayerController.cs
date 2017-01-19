@@ -17,8 +17,9 @@ public class PlayerController : MonoBehaviour {
 
 	#region Variables
 
-	public static float distanceTraveled = 0;
+	public static PlayerController instance;
 
+	public float distanceTraveled = 0;
 	[SerializeField] private float _jumpSpeed = 20f;
 	[SerializeField] private float _movementSpeed = 5f;
 	private Rigidbody _rigidbody;
@@ -27,6 +28,16 @@ public class PlayerController : MonoBehaviour {
 
 	#region Methods
 
+	void Awake()
+	{
+		if (instance != null && instance != this)
+		{
+			Destroy(this.gameObject);
+			return;
+		}
+
+		instance = this; 
+	}
 	void Start()
 	{
 		_rigidbody = GetComponent<Rigidbody>();
@@ -41,6 +52,12 @@ public class PlayerController : MonoBehaviour {
 		}
 		transform.Translate(_movementSpeed * Time.deltaTime, 0f, 0f);
 		distanceTraveled = transform.localPosition.x;
+	}
+
+	public void ResetPosition(float positionDifference)
+	{
+		Vector3 temp = transform.position - positionDifference * Vector3.right;
+		transform.position = temp;
 	}
 
 	#endregion 

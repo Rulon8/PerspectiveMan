@@ -22,6 +22,25 @@ public interface IBlock {
 		get;
 	}
 
+//	Vector3 Position
+//	{
+//		get;
+//		set;
+//	}
+//
+//	string Name
+//	{
+//		get;
+//		set;
+//	}
+//
+//	Vector3 Size
+//	{
+//		get;
+//		set;
+//	}
+//
+
 	#endregion
 
 }
