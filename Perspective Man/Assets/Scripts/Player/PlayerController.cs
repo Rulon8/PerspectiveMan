@@ -17,6 +17,9 @@ public class PlayerController : MonoBehaviour
 	#region Constants
 
 	public const float FLOOR_WIDTH = 10f;
+	public const float HORIZONTAL_MOVEMENT_SPEED = 10f;
+	public const float GROUNDED_ROTATION_SPEED = 15f;
+	public const float AIRBORNE_ROTATION_SPEED = 7f;
 
 	#endregion
 
@@ -28,16 +31,16 @@ public class PlayerController : MonoBehaviour
 	[SerializeField] private float _forwardSpeed;
 	[SerializeField] private bool _gravityInverted;
 	[SerializeField] private bool _isGrounded;
-	[SerializeField] private float _groundCheckDistance;
 	[SerializeField] float _gravityMultiplier;
-	[SerializeField] private Rigidbody _rigidbody;
 	[SerializeField] private float _jumpPower;
-	[SerializeField] private float _origGroundCheckDistance;
-	[SerializeField] private Camera _camera;
-	[SerializeField] private CameraController _cameraController;
 	[SerializeField] private bool _isGravityChanging;
-
+	[SerializeField] private bool _isMoving;
 	private float _distanceTraveled = 0;
+	private float _origGroundCheckDistance;
+	private Camera _camera;
+	private CameraController _cameraController;
+	private Rigidbody _rigidbody;
+	private float _groundCheckDistance;
 
 	#endregion
 
@@ -120,7 +123,7 @@ public class PlayerController : MonoBehaviour
 		_lane = 2;
 		_forwardSpeed = 2f;
 		_gravityInverted = false;
-		_groundCheckDistance = 0.6f;
+		_groundCheckDistance = 0.8f;
 		_rigidbody = GetComponent<Rigidbody>();
 		_isGrounded = true;
 		_jumpPower = 12f;
@@ -129,21 +132,22 @@ public class PlayerController : MonoBehaviour
 		_camera = Camera.main;
 		_cameraController = (CameraController) _camera.GetComponent("CameraController");
 		_isGravityChanging = false;
+		_isMoving = false;
 	}
 
 	// Update is called once per frame
 	void Update() 
 	{
-		if (!_cameraController.TwoDMode)
+		if (!_cameraController.Is2DMode && !_isMoving && !_isGravityChanging)
 		{
 			if (Input.GetKeyDown(KeyCode.A))
 			{
-				Move("Left");
+				StartCoroutine(Move("Left"));
 			}
 
 			if (Input.GetKeyDown(KeyCode.D))
 			{
-				Move("Right");
+				StartCoroutine(Move("Right"));
 			}
 		}
 
@@ -178,6 +182,7 @@ public class PlayerController : MonoBehaviour
 				if (Input.GetKeyDown(KeyCode.Q))
 				{
 					ChangeGravity();
+					StartCoroutine(Rotate());
 				}
 			}
 			else
@@ -187,26 +192,37 @@ public class PlayerController : MonoBehaviour
 		}
 	}
 
-	void Move(string direction) 
+	IEnumerator Move(string direction) 
 	{
+		_isMoving = true;
 		switch (direction)
 		{
 		case "Left":
 			if (_lane != 1 && _lane != 4)
 			{
+				for (float f = 0f; f <= HORIZONTAL_MOVEMENT_SPEED; f += 1f)
+				{
+					transform.Translate(new Vector3(0, 0, (FLOOR_WIDTH / 4) / HORIZONTAL_MOVEMENT_SPEED), Space.World);
+					yield return null;
+				}
 				_lane--;
-				transform.Translate(new Vector3(0, 0, FLOOR_WIDTH / 4));
+
 			}
 			break;
 
 		case "Right":
 			if (_lane != 3 && _lane != 6)
 			{
+				for (float f = 0f; f <= HORIZONTAL_MOVEMENT_SPEED; f += 1f)
+				{
+					transform.Translate(new Vector3(0, 0, (-FLOOR_WIDTH / 4) / HORIZONTAL_MOVEMENT_SPEED), Space.World);
+					yield return null;
+				}
 				_lane++;
-				transform.Translate(new Vector3(0, 0, -FLOOR_WIDTH / 4));
 			}
 			break;
 		}
+		_isMoving = false;
 	}
 
 	void Jump() 
@@ -226,6 +242,28 @@ public class PlayerController : MonoBehaviour
 		_isGravityChanging = true;
 		Physics.gravity = new Vector3(0, -Physics.gravity.y, 0);
 		_gravityInverted = !_gravityInverted;
+	}
+
+	IEnumerator Rotate()
+	{
+		if (_isGrounded)
+		{
+			for (float f = 0f; f < GROUNDED_ROTATION_SPEED; f += 1f)
+			{
+				transform.Rotate(180f / GROUNDED_ROTATION_SPEED, 0, 0);
+				_cameraController.ResetRotation();
+				yield return null;
+			}
+		}
+		else
+		{
+			for (float f = 0f; f < AIRBORNE_ROTATION_SPEED; f += 1f)
+			{
+				transform.Rotate(180f / AIRBORNE_ROTATION_SPEED, 0, 0);
+				_cameraController.ResetRotation();
+				yield return null;
+			}
+		}
 	}
 
 	void CheckGroundStatus()

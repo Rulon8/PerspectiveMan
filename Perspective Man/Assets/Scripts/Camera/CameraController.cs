@@ -21,6 +21,11 @@ public class CameraController : MonoBehaviour {
 	public const float X_ROTATION = 0f;
 	public const float Y_ROTATION = 90f;
 	public const float Z_ROTATION = 0f;
+	public const float X_OFFSET_2D = 6f;
+	public const float X_OFFSET_3D = -8f;
+	public const float Y_POSITION = 0f;
+	public const float Z_POSITION_2D = -14f;
+	public const float Z_POSITION_3D = 0f;
 
 	#endregion
 
@@ -30,21 +35,17 @@ public class CameraController : MonoBehaviour {
 	[SerializeField] private Camera _camera;
 	[SerializeField] private GameObject _player;
 	[SerializeField] private bool _changingPerspective;
-	[SerializeField] private float _changeSpeed;
-	[SerializeField] private Rigidbody _playerRigidbody;
+	[SerializeField] private float _movementChangeSpeed;
 	[SerializeField] private Matrix4x4 _orthographic;
 	[SerializeField] private Matrix4x4 _perspective;
-	[SerializeField] private float _aspect;
-	[SerializeField] private float _fieldOfView;
-	[SerializeField] private float _nearClipPlane;
-	[SerializeField] private float _farClipPlane;
-	[SerializeField] private float _orthographicViewSize;
+	[SerializeField] private float _perspectiveChangeSpeed;
+	[SerializeField] private Quaternion _rotation;
 
 	#endregion
 
 	#region Properties
 
-	public bool TwoDMode
+	public bool Is2DMode
 	{
 		get
 		{
@@ -68,20 +69,40 @@ public class CameraController : MonoBehaviour {
 		}
 	}
 
+	public Quaternion Rotation
+	{
+		get
+		{
+			return _rotation;
+		}
+		set
+		{
+			_rotation = value;
+		}
+	}
+
 	#endregion
 
 	#region Methods
 
 	// Use this for initialization
 	void Start () {
-		_2DMode = false;
 		_camera = GetComponent<Camera>();
 		_camera.farClipPlane = 100f;
 		_orthographic = Matrix4x4.Ortho(-_camera.orthographicSize * _camera.aspect, _camera.orthographicSize * _camera.aspect, -_camera.orthographicSize, _camera.orthographicSize, _camera.nearClipPlane, _camera.farClipPlane);
 		_perspective = Matrix4x4.Perspective(_camera.fieldOfView, _camera.aspect, _camera.nearClipPlane, _camera.farClipPlane);
 		_player = GameObject.FindWithTag("Player");
 		_changingPerspective = false;
-		_changeSpeed = 30f;
+		_movementChangeSpeed = 30f;
+		_perspectiveChangeSpeed = 0.05f;
+		_rotation = _camera.transform.rotation;
+
+		if (_2DMode)
+		{
+			transform.position = new Vector3(_player.transform.position.x + X_OFFSET_2D, Y_POSITION, Z_POSITION_2D);
+			transform.Rotate(0, -Y_ROTATION, 0);
+			_camera.orthographic = true;
+		}
 	}
 	
 	// Update is called once per frame
@@ -92,21 +113,21 @@ public class CameraController : MonoBehaviour {
 			{
 				if (_2DMode)
 				{
-					StartCoroutine(ChangeDimension(-X_TRANSLATION, Y_TRANSLATION, Z_TRANSLATION, X_ROTATION, Y_ROTATION, Z_ROTATION, _camera.projectionMatrix, _perspective, 2f));
+					StartCoroutine(ChangeDimension(-X_TRANSLATION, Y_TRANSLATION, Z_TRANSLATION, X_ROTATION, Y_ROTATION, Z_ROTATION, _camera.projectionMatrix, _perspective, _perspectiveChangeSpeed));
 				}
 				else
 				{
-					StartCoroutine(ChangeDimension(X_TRANSLATION, Y_TRANSLATION, -Z_TRANSLATION, X_ROTATION, -Y_ROTATION, Z_ROTATION, _camera.projectionMatrix, _orthographic, 2f));
+					StartCoroutine(ChangeDimension(X_TRANSLATION, Y_TRANSLATION, -Z_TRANSLATION, X_ROTATION, -Y_ROTATION, Z_ROTATION, _camera.projectionMatrix, _orthographic, _perspectiveChangeSpeed));
 				}
 			}
 
 			if (_2DMode)
 			{
-				transform.position = new Vector3(_player.transform.position.x + 6, 0, -14);
+				transform.position = new Vector3(_player.transform.position.x + X_OFFSET_2D, Y_POSITION, Z_POSITION_2D);
 			}
 			else
 			{
-				transform.position = new Vector3(_player.transform.position.x - 8, 0, 0);
+				transform.position = new Vector3(_player.transform.position.x + X_OFFSET_3D, Y_POSITION, Z_POSITION_3D);
 			}
 		}
 	}
@@ -118,30 +139,30 @@ public class CameraController : MonoBehaviour {
 
 		if (_2DMode)
 		{
-			for (float i = 0f; i < 1f; i += 0.05f)
+			for (float i = 0f; i < 1f; i += _perspectiveChangeSpeed)
 			{
 				_camera.projectionMatrix = MatrixLerp(src, dest, i);
 				yield return 1;
 			}
 			_camera.projectionMatrix = dest;
 
-			for (float i = 0f; i < _changeSpeed; i += 1f)
+			for (float i = 0f; i < _movementChangeSpeed; i += 1f)
 			{
-				transform.Translate(xTrans / _changeSpeed, 0, zTrans / _changeSpeed, Space.World);
-				transform.Rotate(0, yRot / _changeSpeed, 0);
+				transform.Translate(xTrans / _movementChangeSpeed, 0, zTrans / _movementChangeSpeed, Space.World);
+				transform.Rotate(0, yRot / _movementChangeSpeed, 0);
 				yield return null;
 			}
 		}
 		else
 		{
-			for (float i = 0f; i < _changeSpeed; i += 1f)
+			for (float i = 0f; i < _movementChangeSpeed; i += 1f)
 			{
-				transform.Translate(xTrans / _changeSpeed, 0, zTrans / _changeSpeed, Space.World);
-				transform.Rotate(0, yRot / _changeSpeed, 0);
+				transform.Translate(xTrans / _movementChangeSpeed, 0, zTrans / _movementChangeSpeed, Space.World);
+				transform.Rotate(0, yRot / _movementChangeSpeed, 0);
 				yield return null;
 			}
 
-			for (float i = 0f; i < 1f; i += 0.05f)
+			for (float i = 0f; i < 1f; i += _perspectiveChangeSpeed)
 			{
 				_camera.projectionMatrix = MatrixLerp(src, dest, i);
 				yield return 1;
@@ -151,6 +172,7 @@ public class CameraController : MonoBehaviour {
 		}
 
 		Time.timeScale = 1;  //Unpause time
+		_rotation = transform.rotation;
 		_changingPerspective = false;
 		_2DMode = !_2DMode;
 	}
@@ -163,6 +185,11 @@ public class CameraController : MonoBehaviour {
 			ret[i] = Mathf.Lerp(from[i], to[i], time);
 		}
 		return ret;
+	}
+
+	public void ResetRotation()
+	{
+		transform.rotation = _rotation;
 	}
 
 	#endregion

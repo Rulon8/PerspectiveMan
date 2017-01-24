@@ -23,7 +23,7 @@ GameObject:
   - component: {fileID: 92200428439035806}
   - component: {fileID: 124481548711955720}
   - component: {fileID: 81674693488354358}
-  - component: {fileID: 114483105274820678}
+  - component: {fileID: 114849402561300102}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -57,7 +57,7 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1149873010358196}
-  m_LocalRotation: {x: -0, y: 0.7071068, z: -0, w: 0.7071068}
+  m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
   m_LocalPosition: {x: -8, y: 3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
@@ -95,7 +95,7 @@ Camera:
     width: 1
     height: 1
   near clip plane: 0.3
-  far clip plane: 1000
+  far clip plane: 100
   field of view: 60
   orthographic: 0
   orthographic size: 5
@@ -163,7 +163,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 112
+  m_Constraints: 120
   m_CollisionDetection: 0
 --- !u!65 &65667095805542334
 BoxCollider:
@@ -191,7 +191,7 @@ Behaviour:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1149873010358196}
   m_Enabled: 1
---- !u!114 &114483105274820678
+--- !u!114 &114849402561300102
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -203,50 +203,46 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _2DMode: 0
-  _camera: {fileID: 0}
-  _player: {fileID: 0}
+  _camera: {fileID: 20145340518262464}
+  _player: {fileID: 1606896623608482}
   _changingPerspective: 0
-  _changeSpeed: 0
-  _playerRigidbody: {fileID: 0}
+  _movementChangeSpeed: 30
   _orthographic:
-    e00: 0
+    e00: 0.089438945
     e01: 0
     e02: 0
-    e03: 0
+    e03: -0
     e10: 0
-    e11: 0
+    e11: 0.2
     e12: 0
-    e13: 0
+    e13: -0
     e20: 0
     e21: 0
-    e22: 0
-    e23: 0
+    e22: -0.020060182
+    e23: -1.0060182
     e30: 0
     e31: 0
     e32: 0
-    e33: 0
+    e33: 1
   _perspective:
-    e00: 0
+    e00: 0.77456397
     e01: 0
     e02: 0
     e03: 0
     e10: 0
-    e11: 0
+    e11: 1.7320508
     e12: 0
     e13: 0
     e20: 0
     e21: 0
-    e22: 0
-    e23: 0
+    e22: -1.0060182
+    e23: -0.60180545
     e30: 0
     e31: 0
-    e32: 0
+    e32: -1
     e33: 0
-  _aspect: 0
-  _fieldOfView: 0
-  _nearClipPlane: 0
-  _farClipPlane: 0
-  _orthographicViewSize: 0
+  _perspectiveChangeSpeed: 0.05
+  rotation: {x: -0, y: 0.7071068, z: -0, w: 0.7071068}
 --- !u!114 &114951694607954308
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -258,18 +254,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f68126ee067d9904dab1fd2fbcdcbcef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _lane: 0
-  _forwardSpeed: 0
-  _gravityInverted: 0
-  _isGrounded: 0
-  _groundCheckDistance: 0
+  _lane: 2
+  _forwardSpeed: 2
+  _gravityInverted: 1
+  _isGrounded: 1
   _gravityMultiplier: 2
-  _rigidbody: {fileID: 0}
-  _jumpPower: 0
-  _origGroundCheckDistance: 0
-  _camera: {fileID: 0}
-  _cameraController: {fileID: 0}
+  _jumpPower: 12
   _isGravityChanging: 0
+  _isMoving: 0
 --- !u!124 &124481548711955720
 Behaviour:
   m_ObjectHideFlags: 1
