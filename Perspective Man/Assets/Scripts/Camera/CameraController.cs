@@ -31,15 +31,17 @@ public class CameraController : MonoBehaviour {
 
 	#region Variables
 
-	[SerializeField] private bool _2DMode;
-	[SerializeField] private Camera _camera;
-	[SerializeField] private GameObject _player;
 	[SerializeField] private bool _changingPerspective;
 	[SerializeField] private float _movementChangeSpeed;
-	[SerializeField] private Matrix4x4 _orthographic;
-	[SerializeField] private Matrix4x4 _perspective;
 	[SerializeField] private float _perspectiveChangeSpeed;
-	[SerializeField] private Quaternion _rotation;
+	[SerializeField] private float _forwardSpeed;
+	private bool _2DMode;
+	private Camera _camera;
+	private GameObject _player;
+	private Quaternion _rotation;
+	private Matrix4x4 _orthographic;
+	private Matrix4x4 _perspective;
+	private static CameraController _instance;
 
 	#endregion
 
@@ -81,9 +83,41 @@ public class CameraController : MonoBehaviour {
 		}
 	}
 
+	public float ForwardSpeed
+	{
+		get
+		{
+			return _forwardSpeed;
+		}
+		set
+		{
+			_forwardSpeed = value;
+		}
+	}
+
+	public static CameraController Instance
+	{
+		get
+		{
+			return _instance;
+		}
+	}
+
 	#endregion
 
 	#region Methods
+
+	void Awake()
+	{
+		if (_instance != null && _instance != this)
+		{
+			Destroy(this.gameObject);
+		}
+		else
+		{
+			_instance = this;
+		}
+	}
 
 	// Use this for initialization
 	void Start () {
@@ -95,12 +129,11 @@ public class CameraController : MonoBehaviour {
 		_changingPerspective = false;
 		_movementChangeSpeed = 30f;
 		_perspectiveChangeSpeed = 0.05f;
-		_rotation = _camera.transform.rotation;
+		_forwardSpeed = 2f;
 
 		if (_2DMode)
 		{
 			transform.position = new Vector3(_player.transform.position.x + X_OFFSET_2D, Y_POSITION, Z_POSITION_2D);
-			transform.Rotate(0, -Y_ROTATION, 0);
 			_camera.orthographic = true;
 		}
 	}
@@ -121,17 +154,16 @@ public class CameraController : MonoBehaviour {
 				}
 			}
 
-			if (_2DMode)
+			if (!_changingPerspective)
 			{
-				transform.position = new Vector3(_player.transform.position.x + X_OFFSET_2D, Y_POSITION, Z_POSITION_2D);
-			}
-			else
-			{
-				transform.position = new Vector3(_player.transform.position.x + X_OFFSET_3D, Y_POSITION, Z_POSITION_3D);
+				transform.Translate(_forwardSpeed * Time.deltaTime, 0, 0, Space.World); 
 			}
 		}
 	}
 
+	/// <summary>
+	/// Coroutine for dimensional change. Pauses time, moves the camera and changes the camera's perspective according to the parameters.
+	/// </summary>
 	IEnumerator ChangeDimension(float xTrans, float yTrans, float zTrans, float xRot, float yRot, float zRot, Matrix4x4 src, Matrix4x4 dest, float duration)
 	{
 		_changingPerspective = true;
@@ -172,11 +204,13 @@ public class CameraController : MonoBehaviour {
 		}
 
 		Time.timeScale = 1;  //Unpause time
-		_rotation = transform.rotation;
 		_changingPerspective = false;
 		_2DMode = !_2DMode;
 	}
 
+	/// <summary>
+	/// Brain-fucking math. DO NOT TOUCH!
+	/// </summary>
 	static Matrix4x4 MatrixLerp(Matrix4x4 from, Matrix4x4 to, float time)
 	{
 		Matrix4x4 ret = new Matrix4x4();
@@ -185,11 +219,6 @@ public class CameraController : MonoBehaviour {
 			ret[i] = Mathf.Lerp(from[i], to[i], time);
 		}
 		return ret;
-	}
-
-	public void ResetRotation()
-	{
-		transform.rotation = _rotation;
 	}
 
 	#endregion

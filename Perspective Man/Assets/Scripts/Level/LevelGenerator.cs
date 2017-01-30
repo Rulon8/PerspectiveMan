@@ -42,7 +42,7 @@ public class LevelGenerator : MonoBehaviour {
 
 	void Update () { 
 		
-		if (_objectQueue.Peek().localPosition.x + _screenDistanceOffset < PlayerController.instance.DistanceTraveled) //Spawns a block every time the player reaches a certain distance from the last block spawned
+		if (_objectQueue.Peek().localPosition.x + _screenDistanceOffset < PlayerController.Instance.DistanceTraveled) //Spawns a block every time the player reaches a certain distance from the last block spawned
 		{
 			SpawnBlock();
 		}

@@ -25,8 +25,6 @@ public class PlayerController : MonoBehaviour
 
 	#region Variables
 
-	public static PlayerController instance;
-
 	[SerializeField] private int _lane;
 	[SerializeField] private float _forwardSpeed;
 	[SerializeField] private bool _gravityInverted;
@@ -41,6 +39,7 @@ public class PlayerController : MonoBehaviour
 	private CameraController _cameraController;
 	private Rigidbody _rigidbody;
 	private float _groundCheckDistance;
+	private static PlayerController _instance;
 
 	#endregion
 
@@ -102,22 +101,30 @@ public class PlayerController : MonoBehaviour
 		}
 	}
 
+	public static PlayerController Instance
+	{
+		get
+		{
+			return _instance;
+		}
+	}
+
 	#endregion
 
 	#region Methods
 
 	void Awake()
 	{
-		if (instance != null && instance != this)
+		if (_instance != null && _instance != this)
 		{
 			Destroy(this.gameObject);
-			return;
 		}
-
-		instance = this; 
+		else
+		{
+			_instance = this;
+		}
 	}
-
-
+		
 	void Start() 
 	{
 		_lane = 2;
@@ -192,6 +199,10 @@ public class PlayerController : MonoBehaviour
 		}
 	}
 
+	/// <summary>
+	/// Coroutine that moves the player between lanes. Can move left or right according to direction only if the player
+	/// is currently in a lane that allows it.
+	/// </summary>
 	IEnumerator Move(string direction) 
 	{
 		_isMoving = true;
@@ -225,6 +236,9 @@ public class PlayerController : MonoBehaviour
 		_isMoving = false;
 	}
 
+	/// <summary>
+	/// Makes the player jump in the direction opposite to gravity
+	/// </summary>
 	void Jump() 
 	{
 		if (_gravityInverted)
@@ -237,6 +251,9 @@ public class PlayerController : MonoBehaviour
 		}
 	}
 
+	/// <summary>
+	/// Reverses the force of gravity
+	/// </summary>
 	void ChangeGravity() 
 	{
 		_isGravityChanging = true;
@@ -244,6 +261,10 @@ public class PlayerController : MonoBehaviour
 		_gravityInverted = !_gravityInverted;
 	}
 
+	/// <summary>
+	/// Coroutine that rotates the player 180 degrees along the x-axis. Rotation speed is different depending of
+	/// whether the player is in the air or the ground.
+	/// </summary>
 	IEnumerator Rotate()
 	{
 		if (_isGrounded)
@@ -251,7 +272,6 @@ public class PlayerController : MonoBehaviour
 			for (float f = 0f; f < GROUNDED_ROTATION_SPEED; f += 1f)
 			{
 				transform.Rotate(180f / GROUNDED_ROTATION_SPEED, 0, 0);
-				_cameraController.ResetRotation();
 				yield return null;
 			}
 		}
@@ -260,12 +280,14 @@ public class PlayerController : MonoBehaviour
 			for (float f = 0f; f < AIRBORNE_ROTATION_SPEED; f += 1f)
 			{
 				transform.Rotate(180f / AIRBORNE_ROTATION_SPEED, 0, 0);
-				_cameraController.ResetRotation();
 				yield return null;
 			}
 		}
 	}
 
+	/// <summary>
+	/// Determines whether the player is standing on the ground or floating in the air and sets the variables accordingly.
+	/// </summary>
 	void CheckGroundStatus()
 	{
 		#if UNITY_EDITOR
@@ -300,6 +322,9 @@ public class PlayerController : MonoBehaviour
 		}
 	}
 
+	/// <summary>
+	/// Applies an extra force to the player while it is in midair
+	/// </summary>
 	void HandleAirborneMovement()
 	{
 		// apply extra gravity from multiplier:
